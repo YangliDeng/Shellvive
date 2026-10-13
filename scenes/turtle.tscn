@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://f8uxrueqr12y"]
+
+[ext_resource type="Script" uid="uid://bbraimaclsdtd" path="res://scripts/turtle.gd" id="1_1l2iw"]
+[ext_resource type="Texture2D" uid="uid://cjtlq80ul7wv5" path="res://assets/prototype1/Characters/turtle and others.png" id="1_diba4"]
+[ext_resource type="Texture2D" uid="uid://cum30vqxff4ld" path="res://assets/prototype1/Characters/choke turtle.png" id="3_hbk6c"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1l2iw"]
+atlas = ExtResource("1_diba4")
+region = Rect2(0, 0, 431, 415)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hbk6c"]
+atlas = ExtResource("1_diba4")
+region = Rect2(431, 0, 431, 415)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ry61x"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1l2iw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hbk6c")
+}],
+"loop": true,
+"name": &"swim",
+"speed": 4.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_7kcg0"]
+radius = 13.0
+
+[node name="Turtle" type="CharacterBody2D" unique_id=441485660 groups=["player"]]
+motion_mode = 1
+script = ExtResource("1_1l2iw")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=9705463]
+position = Vector2(-21.999985, -1)
+scale = Vector2(0.223, 0.25)
+sprite_frames = SubResource("SpriteFrames_ry61x")
+animation = &"swim"
+autoplay = "swim"
+frame_progress = 0.069727354
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=98750773]
+position = Vector2(11, -12)
+shape = SubResource("CircleShape2D_7kcg0")
+
+[node name="ChokedSprite" type="Sprite2D" parent="." unique_id=755932515]
+position = Vector2(-24, 6)
+scale = Vector2(0.05908204, 0.07067871)
+texture = ExtResource("3_hbk6c")

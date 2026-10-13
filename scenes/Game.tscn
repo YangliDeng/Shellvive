@@ -1,0 +1,89 @@
+[gd_scene format=3 uid="uid://t57cfxfjuw2u"]
+
+[ext_resource type="Script" uid="uid://bl2dxtcfr1ayh" path="res://scripts/game.gd" id="1_ibkli"]
+[ext_resource type="PackedScene" uid="uid://f8uxrueqr12y" path="res://scenes/turtle.tscn" id="2_qbsmt"]
+[ext_resource type="Script" uid="uid://driwlpp013hok" path="res://scripts/background.gd" id="3_78awf"]
+[ext_resource type="Texture2D" uid="uid://boqbi3y752f2r" path="res://assets/prototype1/Background/ChatGPT Image 2026年9月24日 18_57_18.png" id="4_s0nni"]
+
+[node name="Game" type="Node2D" unique_id=1598362813]
+script = ExtResource("1_ibkli")
+max_survival = null
+survival_drain = null
+jelly_recovery = null
+plastic_damage = null
+choke_chance = null
+water_top_ratio = null
+water_bottom_ratio = null
+spawn_vertical_margin = null
+
+[node name="SpawnTimer" type="Timer" parent="." unique_id=1550709125]
+wait_time = 1.5
+autostart = true
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=227131224]
+
+[node name="ScoreLabel" type="Label" parent="HUD" unique_id=1222311167]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 125.0
+offset_bottom = 59.0
+theme_override_font_sizes/font_size = 28
+text = "Score: 0"
+
+[node name="SurvivalBar" type="ProgressBar" parent="HUD" unique_id=1597460228]
+offset_left = 20.0
+offset_top = 65.0
+offset_right = 280.0
+offset_bottom = 92.0
+
+[node name="GameOverPanel" type="Panel" parent="HUD" unique_id=1552376006]
+offset_left = 440.0
+offset_top = 240.0
+offset_right = 840.0
+offset_bottom = 480.0
+
+[node name="ResultLabel" type="Label" parent="HUD/GameOverPanel" unique_id=376954893]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 380.0
+offset_bottom = 140.0
+text = "Game Over"
+
+[node name="RestartButton" type="Button" parent="HUD/GameOverPanel" unique_id=20523657]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 165.0
+offset_right = 190.0
+offset_bottom = 215.0
+text = "Restart"
+
+[node name="QuitButton" type="Button" parent="HUD/GameOverPanel" unique_id=1512815867]
+layout_mode = 0
+offset_left = 210.0
+offset_top = 165.0
+offset_right = 370.0
+offset_bottom = 215.0
+text = "Quit"
+
+[node name="LevelLabel" type="Label" parent="HUD" unique_id=709775016]
+offset_left = 20.0
+offset_top = 100.0
+offset_right = 60.0
+offset_bottom = 123.0
+
+[node name="Turtle" parent="." unique_id=441485660 instance=ExtResource("2_qbsmt")]
+position = Vector2(250, 360)
+
+[node name="Background" type="Parallax2D" parent="." unique_id=145110010]
+z_index = -10
+scale = Vector2(0.8, 0.8)
+script = ExtResource("3_78awf")
+
+[node name="Sprite2D" type="Sprite2D" parent="Background" unique_id=918363128]
+texture = ExtResource("4_s0nni")
+centered = false
+
+[node name="PlasticTimer" type="Timer" parent="." unique_id=934757605]
+wait_time = 2.0
+autostart = true

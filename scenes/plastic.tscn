@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://bdekmritq8qa6"]
+
+[ext_resource type="Script" uid="uid://coih1momnf36t" path="res://scripts/plastic.gd" id="1_fjkm0"]
+[ext_resource type="Texture2D" uid="uid://cjtlq80ul7wv5" path="res://assets/prototype1/Characters/turtle and others.png" id="2_cixle"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jfite"]
+size = Vector2(39, 47)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qq501"]
+atlas = ExtResource("2_cixle")
+region = Rect2(836, 418, 418, 418)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ng0cq"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qq501")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="Plastic" type="Area2D" unique_id=241976985]
+script = ExtResource("1_fjkm0")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=254197233]
+position = Vector2(-2.5, 26.5)
+shape = SubResource("RectangleShape2D_jfite")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1654176913]
+position = Vector2(-6, 25)
+scale = Vector2(0.16566986, 0.1632775)
+sprite_frames = SubResource("SpriteFrames_ng0cq")

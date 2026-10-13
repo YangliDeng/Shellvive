@@ -1,0 +1,12 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+.godot/
+build/
+builds/
+exports/
+*.exe
+*.pck
+*.zip
+export_credentials.cfg
