@@ -1,0 +1,67 @@
+[gd_resource type="SpriteFrames" format=3 uid="uid://bkxdlrjfg2hjv"]
+
+[ext_resource type="Texture2D" uid="uid://oeug608wv7ga" path="res://assets/box_handdrawn/box_marking_frames.png" id="1_box_marks"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_BoxMark0"]
+atlas = ExtResource("1_box_marks")
+region = Rect2(0, 0, 634, 568)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_BoxMark1"]
+atlas = ExtResource("1_box_marks")
+region = Rect2(634, 0, 634, 568)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_BoxMark2"]
+atlas = ExtResource("1_box_marks")
+region = Rect2(1268, 0, 634, 568)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_BoxMark3"]
+atlas = ExtResource("1_box_marks")
+region = Rect2(1902, 0, 634, 568)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_BoxMark4"]
+atlas = ExtResource("1_box_marks")
+region = Rect2(0, 568, 634, 568)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_BoxMark5"]
+atlas = ExtResource("1_box_marks")
+region = Rect2(634, 568, 634, 568)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_BoxMark6"]
+atlas = ExtResource("1_box_marks")
+region = Rect2(1268, 568, 634, 568)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_BoxMark7"]
+atlas = ExtResource("1_box_marks")
+region = Rect2(1902, 568, 634, 568)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_BoxMark0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_BoxMark1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_BoxMark2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_BoxMark3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_BoxMark4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_BoxMark5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_BoxMark6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_BoxMark7")
+}],
+"loop": true,
+"name": &"marking_loop",
+"speed": 10.0
+}]

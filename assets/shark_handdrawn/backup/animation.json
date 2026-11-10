@@ -1,0 +1,14 @@
+{
+  "image": "shark_swim.png",
+  "frame_width": 524,
+  "frame_height": 210,
+  "columns": 6,
+  "rows": 4,
+  "frame_count": 24,
+  "fps": 20,
+  "loop": true,
+  "facing": "left",
+  "drawn_source_poses": 2,
+  "tail_transition": "contour-aligned continuous morph",
+  "red_stroke_update_fps": 6.666667
+}

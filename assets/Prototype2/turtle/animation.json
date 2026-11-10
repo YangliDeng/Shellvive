@@ -1,0 +1,16 @@
+{
+  "body_image": "body_frames.png",
+  "body_frames": 2,
+  "body_fps": 2.5,
+  "outlined_image": "outlined_frames.png",
+  "moving_outline_image": "moving_outline_frames.png",
+  "moving_outline_frames": 8,
+  "moving_outline_columns": 4,
+  "moving_outline_rows": 2,
+  "moving_outline_fps": 10,
+  "frame_width": 720,
+  "frame_height": 540,
+  "facing": "right",
+  "outline_choice_pending": true,
+  "outline_source": "Actual green marker strokes from the supplied turtle photograph"
+}

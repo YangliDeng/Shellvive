@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/net.gd" id="1_net"]
+
+[node name="Net" type="Area2D"]
+collision_layer = 0
+collision_mask = 1
+monitorable = false
+script = ExtResource("1_net")
+
+[node name="CollisionShape2D0" type="CollisionShape2D" parent="."]
+
+[node name="CollisionShape2D1" type="CollisionShape2D" parent="."]

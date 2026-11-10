@@ -8,6 +8,10 @@ signal eaten(
 
 @export var speed: float = 180.0
 
+@export_group("Appearance")
+@export_range(24.0, 120.0, 1.0) var display_height: float = 88.0
+@export_range(1.0, 2.0, 0.05) var big_size_multiplier: float = 1.4
+
 var points: int = 10
 var recovery: float = 12.0
 var is_big: bool = false
@@ -17,28 +21,35 @@ var is_eaten: bool = false
 
 func _ready() -> void:
 	add_to_group("sea_food")
+	var sprite := $AnimatedSprite2D as AnimatedSprite2D
 
 	if is_big:
-		scale *= 1.4
+		scale *= big_size_multiplier
 
-		var sprite := get_node_or_null(
-			"AnimatedSprite2D"
-		) as AnimatedSprite2D
-
-		if sprite and big_texture:
+		if big_texture:
 			var frames := SpriteFrames.new()
 			frames.add_frame("default", big_texture)
-
 			sprite.sprite_frames = frames
-			sprite.scale = (
-				Vector2.ONE * 72.0 / big_texture.get_width()
-			)
 			sprite.play("default")
-		elif sprite:
-			sprite.modulate = Color("e5b9ff")
+		else:
+			sprite.play("large")
+	else:
+		sprite.play("default")
+	_fit_jelly()
 
 	if not body_entered.is_connected(_on_body_entered):
 		body_entered.connect(_on_body_entered)
+
+
+func _fit_jelly() -> void:
+	var sprite := $AnimatedSprite2D as AnimatedSprite2D
+	var frame: Texture2D = sprite.sprite_frames.get_frame_texture(sprite.animation, 0)
+	sprite.position = Vector2.ZERO
+	sprite.scale = Vector2.ONE * display_height / frame.get_height()
+	var shape := RectangleShape2D.new()
+	shape.size = frame.get_size() * sprite.scale * Vector2(0.7, 0.85)
+	$CollisionShape2D.shape = shape
+	$CollisionShape2D.position = Vector2.ZERO
 
 
 func _physics_process(delta: float) -> void:

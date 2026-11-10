@@ -1,0 +1,16 @@
+# Hand-painted jellyfish
+
+Transparent cutouts of the two jellyfish in the watercolor photograph supplied by the user. Background extraction used the built-in imagegen tool.
+
+- `red_jelly.png`: normal jellyfish, 10 points.
+- `purple_jelly.png`: large jellyfish, 30 points.
+- `scenes/jelly.tscn` contains both textures. `scripts/jelly.gd` selects the matching image and fits its sprite and collision shape.
+- Inspector: Jelly > Appearance > Display Height is the normal height (88 pixels); Big Size Multiplier is 1.4, giving the large jellyfish a height of 123.2 pixels.
+
+## Red jellyfish extraction prompt
+
+Use case: background-extraction. Asset type: transparent PNG cutout sprite for the user's Godot game. Input image is the edit target, an original photographed watercolor painting on paper of two jellyfish. Extract ONLY the LOWER LEFT jellyfish with the red and pink bell, gold rim, blue/purple/pink tentacles and very fine gold strands. The upper-right purple jellyfish must be absent. Remove ALL unpainted paper, tabletop and cast shadows, including the unpainted background in the gaps between tentacles, and provide a genuinely transparent alpha background. Preserve this exact original painted jellyfish, its asymmetric pose, the tilt of the red bell, every original tentacle and delicate filament, gold pigment, white painted highlights, watercolor granulation, imperfect hand-painted edges, proportions and orientation. This is a faithful cutout, not an illustration redesign. Keep all painted white and pale lavender areas belonging to the creature; clear the beige paper between strands. Keep the subject's original complete silhouette and all thin trailing tips. Only compensate for the photographic warm paper tint where needed. One isolated complete red jellyfish on transparency with modest transparent padding, portrait framing, no new objects, no extra paint strokes, no invented outlines, no text, no checkerboard baked into the image.
+
+## Purple jellyfish extraction prompt
+
+Use case: background-extraction. Asset type: transparent PNG cutout sprite for the user's Godot game. The input is the edit target, an original photographed watercolor painting on paper of two jellyfish. Extract ONLY the UPPER RIGHT jellyfish: broad purple/magenta rounded bell, white painted highlights and white scalloped lower bell edge, dark purple wavy tentacles with pale lavender, pink and blue watercolor ribbons, thin trailing purple filaments. The lower-left red jellyfish must be absent. Remove ALL unpainted paper, tabletop, photographic cast shadows and unpainted beige gaps between tentacles; output real transparent alpha. Preserve the exact original artwork, shape, pose, colors, hand-painted imperfections, delicate filament shapes, watercolor pigment texture and full silhouette. This is faithful background removal, not redesign or re-illustration. Preserve white pigment and pale lavender parts of the animal while cutting away the plain beige paper spaces. No bright cyan/green extraction fringes or colored matte residue. Keep the natural purple and muted blue watercolor palette, no invented paint strokes, no outlines, no text, no other objects. Complete single jellyfish with every fine tip uncut, centered in portrait framing with modest transparent padding, genuinely transparent background with no baked checkerboard or paper rectangle.

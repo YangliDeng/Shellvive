@@ -1,0 +1,17 @@
+{
+  "source": "box.png",
+  "image": "box_marking_frames.png",
+  "sprite_frames_resource": "box_marking_animation.tres",
+  "animation_name": "marking_loop",
+  "columns": 4,
+  "rows": 2,
+  "frame_count": 8,
+  "frame_width": 634,
+  "frame_height": 568,
+  "fps": 10,
+  "loop": true,
+  "frames_include_body": true,
+  "body_is_static": true,
+  "marking_source": "Original yellow marker strokes extracted from box.png",
+  "stroke_roots_anchored": true
+}

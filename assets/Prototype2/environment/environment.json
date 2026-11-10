@@ -1,0 +1,24 @@
+{
+  "canvas_width": 1980,
+  "canvas_height": 1470,
+  "ocean": "ocean.png",
+  "ocean_rotation_degrees": 90,
+  "positive_rotation_direction": "counterclockwise",
+  "normal_seabed": "seabed.png",
+  "seabed_rotation_degrees": -90,
+  "higher_difficulty_seabed": "seabed_hard.png",
+  "higher_difficulty_visual_cue": "Belly-up dead tiger shark and fishing net lying entirely on the sandy seabed",
+  "dead_shark_cutout": "dead_shark.png",
+  "corpse_is_background": true,
+  "gameplay_difficulty_logic_changed": false,
+  "shark_placement": {
+    "x": 1300,
+    "y": 1165,
+    "width": 409,
+    "height": 281
+  },
+  "body_burial_fraction": 0.0,
+  "dead_shark_orientation": "belly_up",
+  "blend": "Full-body placement inside the opaque sandy area with a subtle contact shadow",
+  "shark_entirely_on_sand": true
+}

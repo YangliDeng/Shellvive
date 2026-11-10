@@ -4,6 +4,8 @@ const JELLY_SCENE = preload("res://scenes/jelly.tscn")
 const PLASTIC_SCENE = preload("res://scenes/plastic.tscn")
 const CHOKE_SCENE = preload("res://scenes/choke_plastic.tscn")
 const BOX_SCENE = preload("res://scenes/box.tscn")
+const SHARK_SCENE = preload("res://scenes/shark.tscn")
+const NET_SCENE = preload("res://scenes/net.tscn")
 const CARD_UI_SCRIPT = preload("res://scripts/card_ui.gd")
 
 const INTRO_END: float = 45.0
@@ -19,6 +21,8 @@ const CHOKE_TIMES: Array[float] = [
 	8.5, 13.0, 17.0, 24.0, 28.0, 38.0, 42.0
 ]
 
+const INTRO_PLASTIC_TIMES: Array[float] = [16.0, 26.0, 34.0, 41.0]
+
 const FOOD_OFFSETS: Array[float] = [
 	0.0, -35.0, 20.0, 65.0, 25.0, -40.0, 0.0
 ]
@@ -31,7 +35,6 @@ const FOOD_OFFSETS: Array[float] = [
 
 @export_group("Water")
 @export_range(0.0, 1.0) var water_top_ratio: float = 0.23
-@export_range(0.0, 1.0) var water_bottom_ratio: float = 0.87
 @export var spawn_vertical_margin: float = 45.0
 @export var spawn_horizontal_margin: float = 160.0
 
@@ -46,6 +49,32 @@ const FOOD_OFFSETS: Array[float] = [
 @export var minimum_choke_gap: float = 7.0
 @export var maximum_sea_plastics: int = 12
 
+@export_group("Shark Encounters")
+@export_range(0.0, 600.0, 1.0) var first_shark_time: float = 12.0
+@export_range(1.0, 120.0, 1.0) var shark_interval: float = 12.0
+@export_range(0.0, 600.0, 1.0) var shark_stop_time: float = 45.0
+
+@export_group("Seabed Boxes")
+@export var first_box_time: float = 10.0
+@export var endless_box_time: float = 65.0
+@export var box_interval_min: float = 22.0
+@export var box_interval_max: float = 32.0
+@export var box_ground_offset := Vector2.ZERO
+@export_range(60.0, 220.0, 1.0) var box_display_width: float = 140.0
+@export_range(0.0, 0.75, 0.01) var box_burial_fraction: float = 0.35
+
+@export_group("Floating Nets")
+@export_range(45.0, 300.0, 1.0) var first_net_time: float = 52.0
+@export_range(1.0, 60.0, 0.5) var net_interval: float = 12.0
+@export_range(1.0, 60.0, 0.5) var minimum_net_interval: float = 7.0
+@export_range(0, 3, 1) var maximum_sea_nets: int = 1
+@export_range(40.0, 300.0, 1.0) var net_speed: float = 140.0
+@export_range(80.0, 400.0, 1.0) var net_width: float = 200.0
+@export_range(100.0, 300.0, 1.0) var net_gap_height: float = 140.0
+@export_range(0.1, 5.0, 0.1) var net_snare_duration: float = 1.2
+@export_range(0.0, 10.0, 0.1) var net_snare_cooldown: float = 2.0
+@export var net_texture: Texture2D
+
 @onready var turtle = get_node_or_null("Turtle")
 @onready var spawn_timer := get_node_or_null("SpawnTimer") as Timer
 @onready var plastic_timer := get_node_or_null("PlasticTimer") as Timer
@@ -56,6 +85,8 @@ const FOOD_OFFSETS: Array[float] = [
 @onready var result_label := get_node_or_null("HUD/GameOverPanel/ResultLabel") as Label
 @onready var restart_button := get_node_or_null("HUD/GameOverPanel/RestartButton") as Button
 @onready var quit_button := get_node_or_null("HUD/GameOverPanel/QuitButton") as Button
+@onready var spawn_shark_button := get_node_or_null("HUD/SpawnSharkButton") as Button
+@onready var background = $Background
 
 var score: int = 0
 var survival: float = 100.0
@@ -74,6 +105,10 @@ var endless_started: bool = false
 var intro_center_y: float = 0.0
 var next_box_time: float = 65.0
 var last_choke_time: float = -100.0
+var next_shark_time: float = 0.0
+var next_net_time: float = 52.0
+var intro_plastic_index: int = 0
+var pollution_started: bool = false
 
 var cards
 var eat_audio: AudioStreamPlayer
@@ -90,6 +125,9 @@ func _ready() -> void:
 		return
 
 	rng.randomize()
+	next_shark_time = first_shark_time
+	next_box_time = endless_box_time
+	next_net_time = maxf(INTRO_END, first_net_time)
 
 	survival = max_survival
 	survival_bar.max_value = max_survival
@@ -102,6 +140,9 @@ func _ready() -> void:
 
 	if not quit_button.pressed.is_connected(_quit_game):
 		quit_button.pressed.connect(_quit_game)
+
+	if spawn_shark_button:
+		spawn_shark_button.pressed.connect(_spawn_shark.bind(true))
 
 	spawn_timer.stop()
 	plastic_timer.stop()
@@ -180,7 +221,12 @@ func _process(delta: float) -> void:
 
 	_run_intro()
 
+	if survival_time >= next_shark_time and survival_time < minf(shark_stop_time, INTRO_END):
+		_spawn_shark()
+		next_shark_time = survival_time + shark_interval
+
 	if survival_time >= INTRO_END and not endless_started:
+		_begin_pollution()
 		endless_started = true
 		_schedule_next_jelly()
 		_schedule_next_plastic()
@@ -189,7 +235,19 @@ func _process(delta: float) -> void:
 		if get_tree().get_nodes_in_group("card_box").is_empty():
 			_spawn_box(false)
 
-		next_box_time = survival_time + rng.randf_range(22.0, 32.0)
+		next_box_time = survival_time + rng.randf_range(box_interval_min, maxf(box_interval_min, box_interval_max))
+
+	if endless_started and survival_time >= next_net_time:
+		_spawn_net()
+		var elapsed: float = survival_time - INTRO_END
+		next_net_time = survival_time + maxf(minimum_net_interval, net_interval / (1.0 + elapsed / 180.0))
+
+
+func _begin_pollution() -> void:
+	pollution_started = true
+	for shark in get_tree().get_nodes_in_group("sea_shark"):
+		shark.retire()
+	background.begin_pollution_transition()
 
 
 func _run_intro() -> void:
@@ -243,7 +301,16 @@ func _run_intro() -> void:
 
 		_create_jelly(big_position, true)
 
-	if survival_time >= 32.0 and not first_box_spawned:
+	while intro_plastic_index < INTRO_PLASTIC_TIMES.size() and survival_time >= INTRO_PLASTIC_TIMES[intro_plastic_index]:
+		for attempt in range(8):
+			var at := _get_spawn_position()
+			if absf(at.y - intro_center_y) < 90.0 or not _position_clear(at, 110.0):
+				continue
+			_create_plastic(at, false)
+			break
+		intro_plastic_index += 1
+
+	if survival_time >= first_box_time and not first_box_spawned:
 		first_box_spawned = true
 		_spawn_box(true)
 
@@ -251,14 +318,18 @@ func _run_intro() -> void:
 func get_water_rect() -> Rect2:
 	var screen := get_viewport_rect().size
 	var top: float = clampf(water_top_ratio, 0.0, 0.9)
-	var bottom: float = clampf(water_bottom_ratio, top + 0.05, 1.0)
+	var bottom: float = get_node("Background").get_water_bottom()
 
 	return Rect2(
 		0.0,
 		screen.y * top,
 		screen.x,
-		screen.y * (bottom - top)
+		maxf(1.0, bottom - screen.y * top)
 	)
+
+
+func get_water_bottom_at(x: float) -> float:
+	return get_node("Background").get_seabed_y(x)
 
 
 func _clamp_y(y: float) -> float:
@@ -291,7 +362,7 @@ func _position_clear(candidate: Vector2, clearance: float) -> bool:
 	if candidate.distance_to(turtle.position) < 200.0:
 		return false
 
-	for group in ["sea_food", "sea_plastic", "card_box"]:
+	for group in ["sea_food", "sea_plastic", "card_box", "sea_shark", "sea_net"]:
 		for object in get_tree().get_nodes_in_group(group):
 			if object.is_queued_for_deletion():
 				continue
@@ -312,6 +383,10 @@ func _create_jelly(at: Vector2, big: bool) -> void:
 	jelly.speed = 270.0 if big else 180.0
 	jelly.big_texture = big_jelly_texture
 	jelly.eaten.connect(_on_jellyfish_eaten)
+	var water := get_water_rect()
+	var size_multiplier: float = jelly.big_size_multiplier if big else 1.0
+	var margin: float = minf(jelly.display_height * size_multiplier * 0.5, water.size.y * 0.5)
+	jelly.position.y = clampf(at.y, water.position.y + margin, water.end.y - margin)
 
 	add_child(jelly)
 
@@ -393,7 +468,46 @@ func _schedule_next_plastic() -> void:
 	)
 
 
-func _spawn_box(first: bool) -> void:
+func _spawn_shark(for_test: bool = false) -> void:
+	if is_game_over or is_selecting or pollution_started:
+		return
+
+	if not get_tree().get_nodes_in_group("sea_shark").is_empty():
+		return
+
+	for attempt in range(8):
+		var at := _get_spawn_position()
+
+		if for_test:
+			at.y = _clamp_y(turtle.position.y)
+
+		if not for_test and attempt < 7 and not _position_clear(at, 180.0):
+			continue
+
+		var shark = SHARK_SCENE.instantiate()
+		shark.position = at
+		shark.target = turtle
+		shark.hit_player.connect(_damage_player)
+		add_child(shark)
+		return
+
+
+func _spawn_net() -> void:
+	if get_tree().get_nodes_in_group("sea_net").size() >= maximum_sea_nets:
+		return
+	var net = NET_SCENE.instantiate()
+	net.position.x = _get_spawn_x()
+	net.speed = net_speed
+	net.net_width = net_width
+	net.gap_height = maxf(net_gap_height, turtle.get_body_margin().y * 2.0 + 30.0)
+	net.gap_center_ratio = rng.randf_range(0.25, 0.75)
+	net.snare_duration = net_snare_duration
+	net.snare_cooldown = net_snare_cooldown
+	net.net_texture = net_texture
+	add_child(net)
+
+
+func _spawn_box(_first: bool) -> void:
 	if is_game_over or is_selecting:
 		return
 
@@ -401,15 +515,12 @@ func _spawn_box(first: bool) -> void:
 		return
 
 	var box = BOX_SCENE.instantiate()
-	var spawn_y: float = get_water_rect().get_center().y
-
-	if first:
-		spawn_y = intro_center_y
-
-	box.position = Vector2(
-		_get_spawn_x(),
-		_clamp_y(spawn_y)
-	)
+	box.position.x = _get_spawn_x() + box_ground_offset.x
+	box.environment = background
+	box.speed = background.scroll_speed
+	box.ground_offset = box_ground_offset
+	box.display_width = box_display_width
+	box.burial_fraction = box_burial_fraction
 
 	box.opened.connect(_on_box_opened)
 	add_child(box)
@@ -450,14 +561,13 @@ func _on_card_use_requested(slot: int, kind: int) -> void:
 	else:
 		var targets: Array[Node] = []
 
-		for target in get_tree().get_nodes_in_group("sea_plastic"):
-			if target.is_queued_for_deletion():
-				continue
-
-			if target.has_hit:
-				continue
-
-			targets.append(target)
+		for group in ["sea_plastic", "sea_net"]:
+			for target in get_tree().get_nodes_in_group(group):
+				if target.is_queued_for_deletion():
+					continue
+				if group == "sea_plastic" and target.has_hit:
+					continue
+				targets.append(target)
 
 		if targets.is_empty():
 			_floating_text(
@@ -528,18 +638,25 @@ func _on_plastic_hit(choking: bool) -> void:
 			Color("ffc28b")
 		)
 	else:
-		survival = maxf(0.0, survival - plastic_damage)
+		_damage_player(plastic_damage)
 
-		_floating_text(
-			"-%d" % int(plastic_damage),
-			turtle.global_position,
-			Color("ff8c8c")
-		)
 
-		_update_hud()
+func _damage_player(damage: float) -> void:
+	if is_game_over or is_selecting:
+		return
 
-		if survival <= 0.0:
-			_end_game()
+	survival = maxf(0.0, survival - damage)
+
+	_floating_text(
+		"-%d" % int(damage),
+		turtle.global_position,
+		Color("ff8c8c")
+	)
+
+	_update_hud()
+
+	if survival <= 0.0:
+		_end_game()
 
 
 func _floating_text(
@@ -611,6 +728,9 @@ func _update_hud() -> void:
 	score_label.text = "Score: %d" % score
 	survival_bar.value = survival
 	level_label.text = "Level: %d | Time: %d s" % [level, int(survival_time)]
+
+	if spawn_shark_button:
+		spawn_shark_button.disabled = pollution_started or not get_tree().get_nodes_in_group("sea_shark").is_empty()
 
 
 func _end_game() -> void:
